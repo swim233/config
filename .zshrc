@@ -114,5 +114,17 @@ else
     yay -Si "$word" 2>/dev/null
 fi'
 zstyle ':fzf-tab:complete:yay:*' fzf-flags '--preview-window=right:60%:wrap'
+
+
+#custom funcation 
+
+fv() {
+    local file
+    file=$(fd --type f --hidden --no-ignore | fzf --preview 'bat --color=always --style=numbers --line-range=:50 {}' --preview-window=right:40%)
+    if [[ -n "$file" ]]; then
+        nvim "$file"
+    fi
+}
+
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
