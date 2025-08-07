@@ -3,6 +3,7 @@ alsa-firmware
 alsa-tools
 alsa-utils
 arch-install-scripts
+arch-wiki-docs-zh-cn
 arch4edu-keyring
 archlinuxcn-keyring
 ark
@@ -58,6 +59,10 @@ git-credential-manager-extras
 google-chrome
 gparted
 grub
+gst-libav
+gst-plugins-bad
+gst-plugins-good
+gstreamer-vaapi
 gwenview
 htop
 imagemagick
@@ -91,9 +96,11 @@ layer-shell-qt
 less
 libc++
 libcaca
+libdvdcss
 libfido2
 libkscreen
 libksysguard
+libmp4v2
 libplasma
 linux-firmware
 linux-headers
@@ -102,6 +109,7 @@ linux-zen-headers
 linuxqq-nt-bwrap
 lolcat
 lsd
+man-db
 mihomo
 milou
 motrix-electron
@@ -109,6 +117,7 @@ ncdu
 neofetch
 neovim
 net-tools
+netease-cloud-music-gtk-bin
 nethogs
 networkmanager
 nilfs-utils
@@ -122,6 +131,7 @@ nvidia-open-dkms
 nvidia-settings
 obs-studio
 ocean-sound-theme
+ogmrip-mpeg
 oh-my-git-git
 oh-my-zsh-git
 onlyoffice-bin
@@ -131,6 +141,7 @@ oxygen
 oxygen-sounds
 partitionmanager
 paru
+pavucontrol
 pipewire-alsa
 pkgstats
 plasma-activities
@@ -157,6 +168,7 @@ power-profiles-daemon
 powerdevil
 prettyping
 print-manager
+pulseaudio-alsa
 python-pysmbc
 qqc2-breeze-style
 qrcodegencpp-cmake
@@ -173,6 +185,7 @@ sndio
 sparkle
 spectacle
 sshfs
+steam
 stress
 supergfxctl
 svt-hevc
