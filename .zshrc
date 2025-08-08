@@ -29,7 +29,7 @@ export https_proxy=http://127.0.0.1:7890
 
 # alias content
 alias ls='lsd'
-
+alias restartplasma='systemctl --user restart plasma-plasmashell.service'
 #fzf-tab
 # disable sort when completing `git checkout`
 zstyle ':completion:*:git-checkout:*' sort false
@@ -126,5 +126,20 @@ fv() {
     fi
 }
 
+#fzf copy
+fzfcp() {
+    local file
+    file=$(fd --type f --hidden \
+        --exclude .git \
+        --exclude node_modules \
+        --exclude .cache \
+        | fzf --preview 'bat --color=always --style=numbers --line-range=:50 {} 2>/dev/null' \
+              --preview-window=right:60%)
+    
+    if [[ -n "$file" ]]; then
+        echo "$file" | wl-copy
+        echo "已复制到剪切板: $file"
+    fi
+}
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh

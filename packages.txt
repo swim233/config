@@ -27,9 +27,11 @@ catimg
 chafa
 cherry-studio
 compsize
+cyc-desktop
 debtap
 discover
 dolphin
+dolphin-plugins
 dosfstools
 drkonqi
 efibootmgr
@@ -102,17 +104,20 @@ libkscreen
 libksysguard
 libmp4v2
 libplasma
+libva-nvidia-driver
 linux-firmware
 linux-headers
 linux-zen
 linux-zen-headers
 linuxqq-nt-bwrap
+localsend
 lolcat
 lsd
 man-db
 mihomo
 milou
 motrix-electron
+nano
 ncdu
 neofetch
 neovim
@@ -176,6 +181,7 @@ rog-control-center
 ros-noetic-rviz
 ros2-arch-deps
 ros2-humble
+s-nail
 sddm
 sddm-kcm
 server-box-bin
@@ -197,6 +203,7 @@ tsukimi-git
 udftools
 unzip
 v4l2loopback-dkms
+vi
 visual-studio-code-bin
 vlc-plugin-mpeg2
 w3m
@@ -206,6 +213,7 @@ waylyrics-git
 wayvnc
 wechat-bwrap
 wget
+wl-clipboard
 xdg-desktop-portal-kde
 xfsprogs
 yay
