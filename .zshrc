@@ -134,7 +134,7 @@ fzfcp() {
         --exclude node_modules \
         --exclude .cache \
         | fzf --preview 'bat --color=always --style=numbers --line-range=:50 {} 2>/dev/null' \
-              --preview-window=right:60%)
+              --preview-window=right:40%)
     
     if [[ -n "$file" ]]; then
         echo "$file" | wl-copy
