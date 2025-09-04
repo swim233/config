@@ -15,7 +15,7 @@ fi
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
 ZSH_THEME="powerlevel10k/powerlevel10k"
-plugins=(git sudo extract zsh-autosuggestions zsh-syntax-highlighting fzf-tab)
+plugins=(git golang sudo extract zsh-autosuggestions zsh-syntax-highlighting fzf-tab)
 
 source /home/swim/.oh-my-zsh/oh-my-zsh.sh
 
@@ -24,12 +24,14 @@ source /home/swim/.oh-my-zsh/oh-my-zsh.sh
 # export MANPATH="/usr/local/man:$MANPATH"
 
 export ZSH="$HOME/.oh-my-zsh"
-export http_proxy=http://127.0.0.1:7890
-export https_proxy=http://127.0.0.1:7890
 
 # alias content
+alias cat='bat'
+alias copy='wl-copy'
 alias ls='lsd'
+alias update='sudo pacman -Syu'
 alias restartplasma='systemctl --user restart plasma-plasmashell.service'
+alias netpaste='curl -F "c=@-" "https://fars.ee/"'
 #fzf-tab
 # disable sort when completing `git checkout`
 zstyle ':completion:*:git-checkout:*' sort false
