@@ -32,6 +32,12 @@ alias ls='lsd'
 alias update='sudo pacman -Syu'
 alias restartplasma='systemctl --user restart plasma-plasmashell.service'
 alias netpaste='curl -F "c=@-" "https://fars.ee/"'
+
+# custom shell scripts
+alias enablecam='~/.local/shell_scripts/enable_cam.sh'
+alias disablecam='~/.local/shell_scripts/disable_cam.sh'
+alias enable_adb_proxy='~/.local/shell_scripts/adb_proxy.sh'
+alias disable_adb_proxy='~/.local/shell_scripts/adb_disbale_proxy.sh'
 #fzf-tab
 # disable sort when completing `git checkout`
 zstyle ':completion:*:git-checkout:*' sort false
@@ -44,6 +50,14 @@ zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
 zstyle ':completion:*' menu no
 # preview directory's content with eza when completing cd
 zstyle ':fzf-tab:complete:cd:*' fzf-preview 'eza -1 --color=always $realpath'
+# preview ls command
+zstyle ':fzf-tab:complete:lsd:*' fzf-preview '
+if [[ -d $realpath ]]; then
+    eza -la --color=always $realpath 2>/dev/null || ls -la --color=always $realpath
+elif [[ -f $realpath ]]; then
+    bat --color=always --style=numbers --line-range=:50 $realpath 2>/dev/null || cat $realpath 2>/dev/null | head -50
+fi'
+zstyle ':fzf-tab:complete:ls:*' fzf-flags '--preview-window=right:60%:wrap'
 # preview ststytem status
 zstyle ':completion:*:systemctl-*:*' list-colors '*.service=0;32:*.target=0;36:*.socket=0;33:*.timer=0;35:*=0;37'
 zstyle ':fzf-tab:complete:systemctl-*:*' fzf-flags '--color=fg:15,fg+:11,bg:-1,bg+:8,hl:6,hl+:14'
@@ -73,8 +87,11 @@ systemctl show $service_name --property=Description --no-pager | cut -d= -f2
 echo -e "\033[36m=== Recent Logs ===\033[0m"
 journalctl -u $service_name --no-pager -n 3 --output=cat 2>/dev/null || echo "No recent logs"'
 zstyle ':fzf-tab:complete:systemctl-*:*' fzf-flags '--preview-window=right:60%:wrap'
-# cutom kill command stayle
+
+# custom kill command style
 zstyle ':fzf-tab:complete:(kill|ps):argument-rest' fzf-preview '[[ $group == "[process ID]" ]] && ps --pid=$word -o cmd --no-headers -w -w'
+zstyle ':fzf-tab:complete:(kill|ps):argument-rest' fzf-flags '--preview-window=down:3:wrap'
+
 # custom fzf flags
 # 为主命令补全设置与 systemctl 相同的配色
 zstyle ':fzf-tab:complete:-command-:*' fzf-flags '--color=fg:15,fg+:11,bg:-1,bg+:8,hl:6,hl+:14'
@@ -90,6 +107,7 @@ zstyle ':fzf-tab:*' fzf-command ftb-tmux-popup
 zstyle ':fzf-tab:*' popup-min-size 90 25
 zstyle ':fzf-tab:*' fzf-min-height 15
 zstyle ':fzf-tab:complete:(pacman|paru|yay):*' fzf-min-height 25
+#
 #pacman complete setting
 # pacman - 只查询官方仓库
 zstyle ':fzf-tab:complete:pacman:*' fzf-preview 'pacman -Si "$word" 2>/dev/null || pacman -Qi "$word" 2>/dev/null'
@@ -117,7 +135,54 @@ else
 fi'
 zstyle ':fzf-tab:complete:yay:*' fzf-flags '--preview-window=right:60%:wrap'
 
+# cp/mv 命令预览
+zstyle ':fzf-tab:complete:(cp|mv):*' fzf-preview '
+if [[ -f $realpath ]]; then
+    echo -e "\033[36m=== 文件信息 ===\033[0m"
+    file $realpath
+    echo -e "\033[36m=== 文件内容预览 ===\033[0m"
+    bat --color=always --style=numbers --line-range=:30 $realpath 2>/dev/null || head -30 $realpath
+elif [[ -d $realpath ]]; then
+    echo -e "\033[36m=== 目录内容 ===\033[0m"
+    eza -la --color=always $realpath 2>/dev/null || ls -la --color=always $realpath
+fi'
+zstyle ':fzf-tab:complete:(cp|mv):*' fzf-flags '--preview-window=right:60%:wrap'
 
+# rm 命令预览（危险操作，显示更多信息）
+zstyle ':fzf-tab:complete:rm:*' fzf-preview '
+if [[ -f $realpath ]]; then
+    echo -e "\033[31m⚠️  即将删除文件: $realpath\033[0m"
+    echo -e "\033[36m=== 文件信息 ===\033[0m"
+    ls -la $realpath
+    file $realpath
+    echo -e "\033[36m=== 文件内容预览 ===\033[0m"
+    bat --color=always --style=numbers --line-range=:20 $realpath 2>/dev/null || head -20 $realpath
+elif [[ -d $realpath ]]; then
+    echo -e "\033[31m⚠️  即将删除目录: $realpath\033[0m"
+    echo -e "\033[36m=== 目录信息 ===\033[0m"
+    ls -lad $realpath
+    echo -e "\033[36m=== 目录内容 ===\033[0m"
+    eza -la --color=always $realpath 2>/dev/null || ls -la --color=always $realpath
+fi'
+zstyle ':fzf-tab:complete:rm:*' fzf-flags '--preview-window=right:65%:wrap'
+
+# vim/nano/code 等编辑器预览
+zstyle ':fzf-tab:complete:(vim|nvim|nano|code|emacs):*' fzf-preview '
+if [[ -f $realpath ]]; then
+    bat --color=always --style=numbers --line-range=:50 $realpath 2>/dev/null || cat $realpath | head -50
+elif [[ -d $realpath ]]; then
+    eza -la --color=always $realpath 2>/dev/null || ls -la --color=always $realpath
+fi'
+zstyle ':fzf-tab:complete:(vim|nvim|nano|code|emacs):*' fzf-flags '--preview-window=right:60%:wrap'
+
+# cat/less/more 等查看文件的命令预览
+zstyle ':fzf-tab:complete:(cat|less|more|bat):*' fzf-preview '
+if [[ -f $realpath ]]; then
+    bat --color=always --style=numbers --line-range=:100 $realpath 2>/dev/null || cat $realpath 2>/dev/null | head -100
+elif [[ -d $realpath ]]; then
+    eza -la --color=always $realpath 2>/dev/null || ls -la --color=always $realpath
+fi'
+zstyle ':fzf-tab:complete:(cat|less|more|bat):*' fzf-flags '--preview-window=right:60%:wrap'
 #custom funcation 
 
 fv() {
