@@ -265,25 +265,92 @@ elif [[ -d $realpath ]]; then
 fi'
 zstyle ':fzf-tab:complete:(vim|nvim|nano|code|emacs):*' fzf-flags '--preview-window=right:60%:wrap'
 
-# 通用安全文件预览（作为后备）
+# 通用智能预览（基于实际 group 值）
+
 zstyle ':fzf-tab:complete:*:*' fzf-preview '
-if [[ -f $realpath ]]; then
-    # 检查文件大小和类型
+# 检查是否为命令补全
+if [[ $group == *"command"* || $group == *"executable"* || $group == *"builtin"* || $group == *"alias"* || $group == *"function"* ]]; then
+    echo -e "\033[32m🔧 命令: $word\033[0m"
+    
+    if command -v $word >/dev/null 2>&1; then
+        echo -e "\033[36m=== 命令信息 ===\033[0m"
+        type $word 2>/dev/null
+        which $word 2>/dev/null
+        
+        echo -e "\033[36m=== 帮助信息 ===\033[0m"
+        # 尝试获取帮助信息
+        if timeout 3s $word --help 2>/dev/null | head -20; then
+            :  # --help 成功
+        elif timeout 3s $word -h 2>/dev/null | head -20; then
+            :  # -h 成功
+        elif man $word 2>/dev/null | col -b | head -20; then
+            :  # man page 成功
+        elif help $word 2>/dev/null | head -20; then
+            :  # builtin help
+        else
+            echo "运行 \`$word --help\` 或 \`man $word\` 查看详细帮助"
+            # 显示简单的文件信息
+            if [[ -f $(which $word 2>/dev/null) ]]; then
+                file $(which $word)
+            fi
+        fi
+    else
+        echo "命令未找到"
+    fi
+    
+elif [[ -f $realpath ]]; then
+    # 文件预览
     size=$(stat -c%s $realpath 2>/dev/null || echo 0)
+    echo -e "\033[36m📄 文件: $(basename $realpath)\033[0m"
+    echo -e "\033[90m大小: $(numfmt --to=iec $size)\033[0m"
+    
     if (( size > 524288 )); then  # 512KB限制
-        echo -e "\033[33m文件过大 ($(numfmt --to=iec $size))，仅显示基本信息\033[0m"
+        echo -e "\033[33m文件过大，仅显示基本信息\033[0m"
         file $realpath 2>/dev/null
         ls -lh $realpath
     elif file $realpath 2>/dev/null | grep -q "binary\|executable\|archive\|image\|video\|audio"; then
-        echo -e "\033[36m二进制文件:\033[0m"
+        echo -e "\033[36m=== 二进制文件信息 ===\033[0m"
         file $realpath
         ls -lh $realpath
+        
+        # 如果是可执行文件，尝试显示帮助
+        if [[ -x $realpath ]]; then
+            echo -e "\033[36m=== 可执行文件帮助 ===\033[0m"
+            timeout 2s $realpath --help 2>/dev/null | head -10 || echo "无帮助信息"
+        fi
     else
+        echo -e "\033[36m=== 文件内容 ===\033[0m"
         bat --color=always --style=numbers --line-range=:30 $realpath 2>/dev/null || head -30 $realpath 2>/dev/null
     fi
+    
 elif [[ -d $realpath ]]; then
-    eza -1 --color=always $realpath 2>/dev/null || ls -1 --color=always $realpath
-fi'#custom funcation 
+    echo -e "\033[34m📂 目录: $(basename $realpath)\033[0m"
+    echo -e "\033[36m=== 目录内容 ===\033[0m"
+    eza -la --color=always $realpath 2>/dev/null || ls -la --color=always $realpath
+    
+else
+    # 其他情况 - 可能是没有 realpath 的命令
+    if [[ -z $realpath ]] && command -v $word >/dev/null 2>&1; then
+        echo -e "\033[32m🔧 命令: $word\033[0m"
+        echo -e "\033[90m分组: $group\033[0m"
+        
+        echo -e "\033[36m=== 命令信息 ===\033[0m"
+        type $word 2>/dev/null
+        which $word 2>/dev/null
+        
+        echo -e "\033[36m=== 帮助信息 ===\033[0m"
+        timeout 3s $word --help 2>/dev/null | head -15 || \
+        timeout 3s $word -h 2>/dev/null | head -15 || \
+        echo "运行 \`$word --help\` 查看帮助"
+    else
+        echo -e "\033[37m❓ 未知项目: $word\033[0m"
+        echo -e "\033[90m分组: $group\033[0m"
+        echo -e "\033[90m路径: $realpath\033[0m"
+    fi
+fi'
+
+
+#custom funcation 
 
 fv() {
     local file
@@ -308,6 +375,7 @@ fzfcp() {
         echo "已复制到剪切板: $file"
     fi
 }
+
 # history with fzf 
 fzf-history-widget() {
   local selected num
@@ -367,3 +435,4 @@ safe_preview() {
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 [[ ! -f ~/.p10k.zsh ]] || source ~/.p10k.zsh
+
